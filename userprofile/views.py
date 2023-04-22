@@ -1,4 +1,5 @@
 from rest_framework import generics, filters
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from .models import UserProfile
@@ -16,6 +17,9 @@ class UserProfileList(generics.ListCreateAPIView):
     search_fields = ["user__email"]
 
     def perform_create(self, serializer):
+        user_profile = UserProfile.objects.filter(user=self.request.user)
+        if user_profile.exists():
+            raise ValidationError("User profile already exists")
         serializer.save(user=self.request.user)
 
 
