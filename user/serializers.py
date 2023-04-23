@@ -1,12 +1,28 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
+from userprofile.serializers import UserProfileSerializer
+
 
 class UserSerializer(serializers.ModelSerializer):
+    following = serializers.SerializerMethodField()
+    followers = serializers.SerializerMethodField()
+    profile = UserProfileSerializer(source="userprofile", read_only=True)
+
     class Meta:
         model = get_user_model()
-        fields = ("id", "email", "first_name", "last_name", "password", "is_staff")
-        read_only_fields = ("is_staff",)
+        fields = (
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "password",
+            "is_staff",
+            "following",
+            "followers",
+            "profile",
+        )
+        read_only_fields = ("is_staff", "following", "followers")
         extra_kwargs = {"password": {"write_only": True, "min_length": 5}}
 
     def create(self, validated_data):
@@ -22,3 +38,11 @@ class UserSerializer(serializers.ModelSerializer):
             user.save()
 
         return user
+
+    def get_following(self, obj):
+        """Get a list of users the current user is following"""
+        return obj.followees.all().values_list("email", flat=True)
+
+    def get_followers(self, obj):
+        """Get a list of users following the current user"""
+        return obj.followers.all().values_list("email", flat=True)

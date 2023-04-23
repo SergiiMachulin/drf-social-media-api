@@ -1,12 +1,10 @@
 from django.urls import path
 
-from .views import UserProfileList, UserProfileDetail, UserProfileUpdate
-
+from .views import UserProfileList, UserDetailProfile
 
 urlpatterns = [
-    path("", UserProfileList.as_view(), name="profile-list"),
-    path("<int:pk>/", UserProfileDetail.as_view(), name="profile-detail"),
-    path("<int:pk>/update/", UserProfileUpdate.as_view(), name="profile-update"),
+    path("profiles/", UserProfileList.as_view(), name="profile-list"),
+    path("profile/", UserDetailProfile.as_view(), name="profile-detail"),
 ]
 
 app_name = "profile"

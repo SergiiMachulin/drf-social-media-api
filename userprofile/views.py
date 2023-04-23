@@ -26,20 +26,11 @@ class UserProfileList(generics.ListCreateAPIView):
         serializer.save(user=self.request.user)
 
 
-class UserProfileDetail(generics.RetrieveAPIView):
-    queryset = UserProfile.objects
-    serializer_class = UserProfileSerializer
-    lookup_url_kwarg = "pk"
-
-
-class UserProfileUpdate(generics.RetrieveUpdateDestroyAPIView):
+class UserDetailProfile(generics.RetrieveUpdateDestroyAPIView):
     queryset = UserProfile.objects
     serializer_class = UserProfileSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
-    lookup_url_kwarg = "pk"
 
     def get_object(self) -> Any:
-        obj = get_object_or_404(
-            self.queryset, pk=self.kwargs[self.lookup_url_kwarg], user=self.request.user
-        )
+        obj = get_object_or_404(self.queryset, user=self.request.user)
         return obj

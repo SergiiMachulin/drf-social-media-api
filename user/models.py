@@ -41,6 +41,22 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractUser):
+    followers = models.ManyToManyField(
+        "self",
+        through="follower.Follower",
+        through_fields=("user", "followee"),
+        symmetrical=False,
+        related_name="following",
+    )
+
+    followees = models.ManyToManyField(
+        "self",
+        through="follower.Follower",
+        through_fields=("followee", "user"),
+        symmetrical=False,
+        related_name="user_followees",
+    )
+
     username = None
     email = models.EmailField(_("email address"), unique=True)
 
@@ -54,3 +70,6 @@ class User(AbstractUser):
 
     def get_full_name(self) -> str:
         return f"{self.first_name} {self.last_name}"
+
+    class Meta:
+        ordering = ["is_staff", "id"]
