@@ -4,6 +4,7 @@ from .models import Post
 
 class PostSerializer(serializers.ModelSerializer):
     user = serializers.CharField(source="user.email", read_only=True)
+    created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
 
     class Meta:
         model = Post
