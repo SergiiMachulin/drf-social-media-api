@@ -5,10 +5,14 @@ from django.db import models
 
 class Follower(models.Model):
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="following"
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="following_set",
     )
     followee = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="followers"
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="followers_set",
     )
     followed_at = models.DateTimeField(auto_now_add=True)
 
