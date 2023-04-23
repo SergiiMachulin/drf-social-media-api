@@ -93,20 +93,21 @@ class UnfollowView(FollowMixin, generics.DestroyAPIView):
         responses={204: None},
     )
     def delete(self, request, *args, **kwargs) -> Response:
+        followee = get_object_or_404(get_user_model(), pk=self.kwargs["pk"])
+
+        user = request.user
+        if user == followee:
+            return Response(
+                {"detail": "You cannot unfollow yourself."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         try:
             instance = self.get_object()
         except Http404:
             return Response(
-                {"detail": "You are not following this user."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        followee = instance.followee
-
-        if request.user == followee:
-            return Response(
-                {"detail": "You cannot unfollow yourself."},
-                status=status.HTTP_400_BAD_REQUEST,
+                {"detail": "Not found."},
+                status=status.HTTP_404_NOT_FOUND,
             )
 
         self.perform_destroy(instance)
