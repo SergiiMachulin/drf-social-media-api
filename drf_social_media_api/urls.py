@@ -22,6 +22,7 @@ from django.urls import path, include
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/user/", include("user.urls", namespace="user")),
-    path("api/user/", include("follower.urls", namespace="follower")),
+    path("api/follower/", include("follower.urls", namespace="follower")),
     path("api/user/me/", include("userprofile.urls", namespace="profile")),
+    path("api/posts/", include("posts.urls", namespace="posts")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
