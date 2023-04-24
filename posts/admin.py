@@ -9,15 +9,15 @@ class HashtagListFilter(admin.SimpleListFilter):
     parameter_name = "hashtags"
 
     def lookups(self, request, model_admin):
-        queryset = model_admin.get_queryset(request)
-        hashtags_list = []
+        queryset = Post.objects.all()
+        hashtags_set = set()
         for post in queryset:
             hashtags = post.hashtags
             if hashtags is not None:
                 for hashtag in hashtags.split("#"):
                     if hashtag:
-                        hashtags_list.append(hashtag.strip())
-        return [(hashtag, hashtag) for hashtag in sorted(set(hashtags_list))]
+                        hashtags_set.add(hashtag.strip())
+        return [(hashtag, hashtag) for hashtag in sorted(hashtags_set)]
 
     def queryset(self, request, queryset):
         if self.value() is None:
