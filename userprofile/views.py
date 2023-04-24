@@ -31,7 +31,9 @@ class UserProfileList(generics.ListCreateAPIView):
 
     @extend_schema(description="Create a new user profile")
     def perform_create(self, serializer) -> Any:
-        user_profile = UserProfile.objects.filter(user=self.request.user)
+        user_profile = UserProfile.objects.select_related("user").filter(
+            user=self.request.user
+        )
         if user_profile.exists():
             raise ValidationError("User profile already exists")
         serializer.save(user=self.request.user)

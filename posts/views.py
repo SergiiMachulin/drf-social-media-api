@@ -1,3 +1,5 @@
+from typing import Any
+
 from django.db.models import Q, QuerySet
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
@@ -63,7 +65,7 @@ class PostViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
 
-    def filter_by_hashtags(self, queryset):
+    def filter_by_hashtags(self, queryset) -> Any:
         hashtags = self.request.query_params.get("hashtags")
         if hashtags:
             hashtags = hashtags.split(",")

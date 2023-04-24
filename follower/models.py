@@ -1,3 +1,5 @@
+from typing import Any
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -22,13 +24,13 @@ class Follower(models.Model):
     def __str__(self) -> str:
         return f"{self.user} follows {self.followee}"
 
-    def clean(self):
+    def clean(self) -> Any:
         if self.user == self.followee:
             raise ValidationError("Cannot follow oneself.")
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         self.clean()
         super().save(*args, **kwargs)
 
-    def unfollow(self):
+    def unfollow(self) -> None:
         self.delete()

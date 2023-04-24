@@ -1,5 +1,7 @@
+from typing import List
+
 from django.contrib import admin
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 
 from posts.models import Post
 
@@ -8,7 +10,7 @@ class HashtagListFilter(admin.SimpleListFilter):
     title = "hashtags"
     parameter_name = "hashtags"
 
-    def lookups(self, request, model_admin):
+    def lookups(self, request, model_admin) -> List:
         queryset = Post.objects.all()
         hashtags_set = set()
         for post in queryset:
@@ -19,7 +21,7 @@ class HashtagListFilter(admin.SimpleListFilter):
                         hashtags_set.add(hashtag.strip())
         return [(hashtag, hashtag) for hashtag in sorted(hashtags_set)]
 
-    def queryset(self, request, queryset):
+    def queryset(self, request, queryset) -> QuerySet:
         if self.value() is None:
             return queryset
 
