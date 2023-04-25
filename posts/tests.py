@@ -1,12 +1,12 @@
 from datetime import datetime
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, force_authenticate
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
 from django.test import TestCase, RequestFactory
 
-from permissions.permissions import IsOwnerOrReadOnly
+
 from posts.admin import PostAdmin, HashtagListFilter
 from posts.models import Post
 from posts.serializers import PostSerializer
@@ -73,6 +73,8 @@ class PostViewSetTestCase(TestCase):
 
     def test_retrieve_post(self):
         url = reverse("posts:posts-detail", args=[self.post1.pk])
+        request = self.client.get(url)
+        force_authenticate(request, user=self.user)
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         serializer_data = PostSerializer(self.post1).data
@@ -92,6 +94,19 @@ class PostViewSetTestCase(TestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Post.objects.filter(pk=self.post1.pk).exists())
+
+    def test_like_post(self):
+        url = reverse("posts:posts-like", args=[self.post1.pk])
+        response = self.client.post(url, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn(self.user, self.post1.likes.all())
+
+    def test_unlike_post(self):
+        self.post1.likes.add(self.user)
+        url = reverse("posts:posts-unlike", args=[self.post1.pk])
+        response = self.client.post(url, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertNotIn(self.user, self.post1.likes.all())
 
 
 class IsOwnerOrReadOnlyTests(TestCase):

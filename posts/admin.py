@@ -3,7 +3,7 @@ from typing import List
 from django.contrib import admin
 from django.db.models import Q, QuerySet
 
-from posts.models import Post
+from posts.models import Post, Comment
 
 
 class HashtagListFilter(admin.SimpleListFilter):
@@ -41,3 +41,8 @@ class HashtagListFilter(admin.SimpleListFilter):
 class PostAdmin(admin.ModelAdmin):
     list_display = ("id", "user", "content", "created_at")
     list_filter = (HashtagListFilter,)
+
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ("user", "content", "created_at")

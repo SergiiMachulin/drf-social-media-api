@@ -6,12 +6,12 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExampl
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from permissions.permissions import IsOwnerOrReadOnly
-from .models import Post
-from .serializers import PostSerializer
+from .models import Post, Comment
+from .serializers import PostSerializer, PostCreateSerializer, CommentSerializer
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -97,4 +97,58 @@ class PostViewSet(viewsets.ModelViewSet):
         return queryset
 
     def perform_create(self, serializer) -> None:
+        serializer.save(user=self.request.user)
+
+    def get_serializer_class(self):
+        if self.action == "create":
+            return PostCreateSerializer
+        return PostSerializer
+
+    @extend_schema(
+        description="Like the post by ID",
+        tags=["posts"],
+        request=None,
+        responses={
+            200: PostSerializer,
+            400: "Invalid post ID or user already liked the post",
+            401: "Authentication credentials were not provided",
+        },
+    )
+    @action(
+        detail=True, methods=["post"], permission_classes=[IsAuthenticated, AllowAny]
+    )
+    def like(self, request, pk=None):
+        post = self.get_object()
+        user = request.user
+        post.likes.add(user)
+        serializer = self.get_serializer(post)
+        return Response(serializer.data)
+
+    @extend_schema(
+        description="Unlike the post by ID",
+        tags=["posts"],
+        request=None,
+        responses={
+            200: PostSerializer,
+            400: "Invalid post ID or user has not liked the post",
+            401: "Authentication credentials were not provided",
+        },
+    )
+    @action(
+        detail=True, methods=["post"], permission_classes=[IsAuthenticated, AllowAny]
+    )
+    def unlike(self, request, pk=None):
+        post = self.get_object()
+        user = request.user
+        post.likes.remove(user)
+        serializer = self.get_serializer(post)
+        return Response(serializer.data)
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
         serializer.save(user=self.request.user)

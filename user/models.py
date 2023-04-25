@@ -39,6 +39,9 @@ class UserManager(BaseUserManager):
 
         return self._create_user(email, password, **extra_fields)
 
+    def liked_posts(self, user):
+        return self.filter(likes=user)
+
 
 class User(AbstractUser):
     followers = models.ManyToManyField(
@@ -70,6 +73,15 @@ class User(AbstractUser):
 
     def get_full_name(self) -> str:
         return f"{self.first_name} {self.last_name}"
+
+    def like_post(self, post):
+        post.likes.add(self)
+
+    def unlike_post(self, post):
+        post.likes.remove(self)
+
+    def has_liked_post(self, post):
+        return post.likes.filter(pk=self.pk).exists()
 
     class Meta:
         ordering = ["is_staff", "id"]
