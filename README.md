@@ -27,12 +27,15 @@ of likes and comments on posts, as well as user engagement.
 # Installation via GitHub
 
 ```shell
-git clone git@github.com:ZhAlexR/social-media-api.git
-cd Cinema-api
+git clone git@github.com:SergiiMachulin/drf-social-media-api
+cd drf-social-media-api
 python3 -m venv venv
 source venv/bin/activete # for linux or macOS
 venv\Scripts\activete # for Windows
 ```
+
+Before run this project, add the environment variable `DJANGO_SECRET_KEY` to your ```.env``` file (example - ```env.sample``` file)
+
 
 Perform the next commands to create DB:
 ```shell
